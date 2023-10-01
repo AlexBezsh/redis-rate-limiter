@@ -1,0 +1,16 @@
+server:
+  servlet:
+    context-path: /redis
+
+spring:
+  config:
+    import: classpath:rateLimitRules.yml
+
+redis:
+  address: ${REDIS_ADDRESS}
+
+springdoc:
+  swagger-ui:
+    tagsSorter: alpha
+    operations-sorter: alpha
+  override-with-generic-response: false

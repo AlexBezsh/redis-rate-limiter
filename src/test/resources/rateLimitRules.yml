@@ -1,0 +1,42 @@
+rate-limit:
+  rules:
+    - client_ip: 1.1.1.1
+      account_id: 1
+      request_type: login
+      time_interval: SECOND
+      allowed_requests_number: 1
+
+    - client_ip: 1.1.1.1
+      account_id: 1
+      time_interval: MINUTE
+      allowed_requests_number: 2
+
+    - client_ip: 1.1.1.1
+      request_type: login
+      time_interval: HOUR
+      allowed_requests_number: 3
+
+    - account_id: 1
+      request_type: login
+      time_interval: DAY
+      allowed_requests_number: 4
+
+    - client_ip: 1.1.1.1
+      time_interval: SECOND
+      allowed_requests_number: 5
+
+    - account_id: 1
+      time_interval: MINUTE
+      allowed_requests_number: 6
+
+    - request_type: login
+      time_interval: HOUR
+      allowed_requests_number: 7
+
+    - client_ip:
+      time_interval: DAY
+      allowed_requests_number: 8
+
+    - account_id:
+      time_interval: SECOND
+      allowed_requests_number: 9

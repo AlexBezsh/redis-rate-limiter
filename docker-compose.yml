@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+
+  rate-limit-server:
+    container_name: rate-limit-server
+    build: ./
+    image: rate-limit-server
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      REDIS_ADDRESS: redis://redis:6379
+    networks:
+      redis_network:
+        ipv4_address: 173.18.0.2
+    depends_on:
+      - redis
+
+  redis:
+    image: ${REDIS_IMAGE}
+    container_name: redis
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis.conf
+    command: [ "redis-server", "/usr/local/etc/redis.conf" ]
+    networks:
+      redis_network:
+        ipv4_address: 173.18.0.3
+
+  redis-ui:
+    image: redislabs/redisinsight:1.14.0
+    container_name: redis-ui
+    ports:
+      - "8001:8001"
+    networks:
+      redis_network:
+        ipv4_address: 173.18.0.4
+    depends_on:
+      - redis
+
+networks:
+  redis_network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 173.18.0.0/24
