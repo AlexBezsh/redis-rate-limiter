@@ -22,8 +22,9 @@ will be associated with its own counter in Redis.
 1. Run `docker-compose up -d` to start Spring Boot application, Redis and Redis UI.
 2. Import `Redis Rate Limiter.postman_collection.json` file to your Postman to call rate limit endpoint.
 3. (Optional) To check Swagger documentation visit http://localhost:8080/redis/swagger-ui/index.html.
-4. (Optional) To use Redis UI: visit `http://localhost:8001` in browser -> click `I already have a database` 
--> `Connect to a Redis Database` -> host - 173.18.0.3, port - 6379, name - enter anything.
+4. (Optional) To use Redis UI: visit `http://localhost:8001` in browser -> click `I already have a database` -> 
+`Connect to a Redis Database` -> host - 173.18.0.3, port - 6379, name - enter anything -> 
+`Select all` -> `Add cluster database`.
 
 ## Technical notes
 

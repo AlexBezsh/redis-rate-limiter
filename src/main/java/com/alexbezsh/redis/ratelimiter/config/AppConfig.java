@@ -24,7 +24,7 @@ public class AppConfig {
     @Bean
     public Config redisConfig() {
         Config config = new Config();
-        config.useSingleServer().setAddress(properties.getAddress());
+        config.useClusterServers().setNodeAddresses(properties.getAddresses());
         return config;
     }
 

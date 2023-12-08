@@ -8,11 +8,13 @@ import com.alexbezsh.redis.ratelimiter.properties.RateLimitRules;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Service;
+import static java.util.concurrent.CompletableFuture.supplyAsync;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +25,6 @@ public class RateLimitService {
     private final StringRedisTemplate template;
     private final RedisScript<Boolean> rateLimitScript;
 
-    @SuppressWarnings("CyclomaticComplexity")
     public void checkLimits(List<RequestDescriptor> descriptors) {
         String key;
         RateLimitRule rule;
@@ -39,10 +40,7 @@ public class RateLimitService {
             }
         }
         if (!keys.isEmpty()) {
-            Boolean isLimitExceeded = template.execute(rateLimitScript, keys, args.toArray());
-            if (Boolean.TRUE.equals(isLimitExceeded)) {
-                throw new RateLimitException();
-            }
+            checkAll(keys, args);
         }
     }
 
@@ -82,6 +80,24 @@ public class RateLimitService {
             case HOUR -> "3600";
             case DAY -> "86400";
         };
+    }
+
+    private void checkAll(List<String> keys, List<String> args) {
+        List<CompletableFuture<Boolean>> completableFutures = new ArrayList<>();
+        for (int i = 0, k = 0; i < keys.size(); i++, k += 2) {
+            List<String> key = List.of(keys.get(i));
+            String expiration = args.get(k);
+            String requestsNumber = args.get(k + 1);
+            completableFutures.add(supplyAsync(
+                () -> template.execute(rateLimitScript, key, expiration, requestsNumber)));
+        }
+        completableFutures.stream()
+            .map(CompletableFuture::join)
+            .filter(Boolean.TRUE::equals)
+            .findAny()
+            .ifPresent(b -> {
+                throw new RateLimitException();
+            });
     }
 
 }

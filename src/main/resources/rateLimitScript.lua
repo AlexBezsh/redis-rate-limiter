@@ -1,15 +1,9 @@
-local index
-local counter
-local result = false
-for i = 2, #ARGV, 2 do
-    index = i / 2
-    counter = tonumber(redis.call("GET", KEYS[index]))
-    if counter == nil then
-        redis.call("SET", KEYS[index], ARGV[i], "EX", ARGV[i - 1])
-    elseif counter > 0 then
-        redis.call("DECR", KEYS[index])
-    else
-        result = true
-    end
+local counter = tonumber(redis.call("GET", KEYS[1]))
+if counter == nil then
+    redis.call("SET", KEYS[1], ARGV[2], "EX", ARGV[1])
+    return false
+elseif counter > 0 then
+    redis.call("DECR", KEYS[1])
+    return false
 end
-return result
+return true

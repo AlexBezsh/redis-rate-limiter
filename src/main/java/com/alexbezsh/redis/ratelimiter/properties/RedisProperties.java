@@ -2,6 +2,8 @@ package com.alexbezsh.redis.ratelimiter.properties;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,7 +20,7 @@ import org.springframework.validation.annotation.Validated;
 public class RedisProperties {
 
     @Valid
-    @NotBlank
-    private String address;
+    @NotNull
+    private List<@NotBlank String> addresses;
 
 }

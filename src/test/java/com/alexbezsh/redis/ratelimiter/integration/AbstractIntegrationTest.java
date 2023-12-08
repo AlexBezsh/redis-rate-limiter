@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -14,6 +15,7 @@ import org.testcontainers.containers.GenericContainer;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Import(TestConfig.class)
 public abstract class AbstractIntegrationTest {
 
     protected static GenericContainer<?> redis = new GenericContainer<>("redis:7.2.3")
@@ -28,7 +30,7 @@ public abstract class AbstractIntegrationTest {
     @DynamicPropertySource
     protected static void properties(DynamicPropertyRegistry registry) {
         redis.start();
-        registry.add("redis.address", () -> String.format("redis://%s:%s",
+        registry.add("redis.addresses", () -> String.format("redis://%s:%s",
             redis.getHost(), redis.getFirstMappedPort()));
     }
 

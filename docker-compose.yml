@@ -10,22 +10,95 @@ services:
     ports:
       - "8080:8080"
     environment:
-      REDIS_ADDRESS: redis://redis:6379
+      REDIS_ADDRESSES: redis://redis-1:6379,redis://redis-2:6379,redis://redis-3:6379,redis://redis-4:6379,redis://redis-5:6379,redis://redis-6:6379
     networks:
       redis_network:
         ipv4_address: 173.18.0.2
     depends_on:
-      - redis
+      - redis-1
+      - redis-2
+      - redis-3
+      - redis-4
+      - redis-5
+      - redis-6
 
-  redis:
+  redis-1:
     image: ${REDIS_IMAGE}
-    container_name: redis
+    container_name: redis-1
     volumes:
       - ./redis.conf:/usr/local/etc/redis.conf
     command: [ "redis-server", "/usr/local/etc/redis.conf" ]
     networks:
       redis_network:
         ipv4_address: 173.18.0.3
+
+  redis-2:
+    image: ${REDIS_IMAGE}
+    container_name: redis-2
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis.conf
+    command: [ "redis-server", "/usr/local/etc/redis.conf" ]
+    networks:
+      redis_network:
+        ipv4_address: 173.18.0.4
+
+  redis-3:
+    image: ${REDIS_IMAGE}
+    container_name: redis-3
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis.conf
+    command: [ "redis-server", "/usr/local/etc/redis.conf" ]
+    networks:
+      redis_network:
+        ipv4_address: 173.18.0.5
+
+  redis-4:
+    image: ${REDIS_IMAGE}
+    container_name: redis-4
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis.conf
+    command: [ "redis-server", "/usr/local/etc/redis.conf" ]
+    networks:
+      redis_network:
+        ipv4_address: 173.18.0.6
+
+  redis-5:
+    image: ${REDIS_IMAGE}
+    container_name: redis-5
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis.conf
+    command: [ "redis-server", "/usr/local/etc/redis.conf" ]
+    networks:
+      redis_network:
+        ipv4_address: 173.18.0.7
+
+  redis-6:
+    image: ${REDIS_IMAGE}
+    container_name: redis-6
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis.conf
+    command: [ "redis-server", "/usr/local/etc/redis.conf" ]
+    networks:
+      redis_network:
+        ipv4_address: 173.18.0.8
+
+  # this container sets up cluster communication and then terminates
+  # redis cluster needs at least 3 nodes, but since we have 1 replica we need at least 6
+  # redis will initialize three nodes as masters and three as slaves automatically
+  init-cluster:
+    image: ${REDIS_IMAGE}
+    container_name: init-cluster
+    command: redis-cli --cluster create 173.18.0.3:6379 173.18.0.4:6379 173.18.0.5:6379 173.18.0.6:6379 173.18.0.7:6379 173.18.0.8:6379 --cluster-replicas 1 --cluster-yes
+    networks:
+      redis_network:
+        ipv4_address: 173.18.0.9
+    depends_on:
+      - redis-1
+      - redis-2
+      - redis-3
+      - redis-4
+      - redis-5
+      - redis-6
 
   redis-ui:
     image: redislabs/redisinsight:1.14.0
@@ -34,9 +107,14 @@ services:
       - "8001:8001"
     networks:
       redis_network:
-        ipv4_address: 173.18.0.4
+        ipv4_address: 173.18.0.10
     depends_on:
-      - redis
+      - redis-1
+      - redis-2
+      - redis-3
+      - redis-4
+      - redis-5
+      - redis-6
 
 networks:
   redis_network:
